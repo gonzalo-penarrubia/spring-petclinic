@@ -74,7 +74,7 @@ pipeline {
                     println '(develop y main): Build container image with Kaniko & Publish to container registry.'
                     sh '''
                         /kaniko/executor \
-                        --context `pwd` \
+                        --context pwd \
                         --insecure \
                         --dockerfile Dockerfile \
                         --destination=nexus-service:8082/repository/docker/spring-petclinic:3.3.0-SNAPSHOT \
