@@ -4,8 +4,6 @@ pipeline {
     stages {
         stage('Check Environment') {
             steps {
-                println '01# Stage - Check Environment'
-                println '(develop y main):  Checking environment Java & Maven versions.'
                 sh 'java -version'
                 container('maven') {
                     sh '''
@@ -17,17 +15,12 @@ pipeline {
             }
         }
         stage('Build') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'develop'
-                }
-            }
             steps {
                 container('maven') {
-                    println '02# Stage - Build'
+                    println '01# Stage - Build'
                     println '(develop y main):  Build a jar file.'
                     sh './mvnw package -Dmaven.test.skip=true'
+                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 }
             }
         }
@@ -90,7 +83,7 @@ pipeline {
                         --dockerfile Dockerfile \
                         --destination=nexus-service:8082/repository/docker/spring-petclinic:3.3.0-SNAPSHOT \
                         --destination=nexus-service:8082/repository/docker/spring-petclinic:latest \
-                        --build-arg JAR_FILE=spring-petclinic-3.3.0-SNAPSHOT.jar
+                        --build-arg VERSION=3.3.0-SNAPSHOT.jar
                     '''
                 }
             }
@@ -110,13 +103,13 @@ pipeline {
                     chmod +x kubectl
                     mkdir -p ~/.local/bin
                     #mv ./kubectl ~/.local/bin/kubectl
-
+                    
                     ./kubectl version --client
                     ./kubectl get all
 
-                    ./kubectl create deployment petclinic --image http://10.152.183.252/:8082/repository/docker/spring-petclinic:latest || \
-                    echo 'Deplyment petclinic already exists, creating service...'
-                    ./kubectl expose deployment petclinic --port 8080 --target-port 8888 --selector app=petclinic --type ClusterIP --name petclinic
+                    ./kubectl create deployment petclinic --image <IP_SERVICIO_NEXUS>:8082/repository/docker/spring-petclinic:latest || \
+                    echo 'Deployment petclinic already exists, creating service...'
+                    ./kubectl expose deployment petclinic --port 8080 --target-port 8080 --selector app=petclinic --type ClusterIP --name petclinic
 
                     ./kubectl get all
                 '''
