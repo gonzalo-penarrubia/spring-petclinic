@@ -88,5 +88,32 @@ pipeline {
                 }
             }
         }
+        stage('Deploy petclinic') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
+            }
+            steps {
+                println '06# Stage - Deploy petclinic'
+                println '(develop y main): Deploy petclinic app to MicroK8s.'
+                sh '''
+                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    chmod +x kubectl
+                    mkdir -p ~/.local/bin
+                    #mv ./kubectl ~/.local/bin/kubectl
+                    
+                    ./kubectl version --client
+                    ./kubectl get all
+
+                    ./kubectl create deployment petclinic --image http://10.152.183.252:8082/repository/docker/spring-petclinic:latest || \
+                    echo 'Deployment petclinic already exists, creating service...'
+                    ./kubectl expose deployment petclinic --port 8080 --target-port 8080 --selector app=petclinic --type ClusterIP --name petclinic
+
+                    ./kubectl get all
+                '''
+            }
+        }
     }
 }
