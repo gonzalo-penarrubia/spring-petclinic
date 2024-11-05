@@ -76,9 +76,14 @@ pipeline {
                 container('kaniko') {
                     println '05# Stage - Build & Publish Container Image'
                     println '(develop y main): Build container image with Kaniko & Publish to container registry.'
+                    
+                    sh '''
+                        mvn clean install
+                    '''
+                    
                     sh '''
                         /kaniko/executor \
-                        --context pwd \
+                        --context . \
                         --insecure \
                         --dockerfile Dockerfile \
                         --destination=nexus-service:8082/repository/docker/spring-petclinic:3.3.0-SNAPSHOT \
