@@ -65,5 +65,28 @@ pipeline {
                 }
             }
         }
+        stage('Build & Publish Container Image') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
+            }
+            steps {
+                container('kaniko') {
+                    println '05# Stage - Build & Publish Container Image'
+                    println '(develop y main): Build container image with Kaniko & Publish to container registry.'
+                    sh '''
+                        /kaniko/executor \
+                        --context `pwd` \
+                        --insecure \
+                        --dockerfile Dockerfile \
+                        --destination=nexus-service:8082/repository/docker/spring-petclinic:3.3.0-SNAPSHOT \
+                        --destination=nexus-service:8082/repository/docker/spring-petclinic:latest \
+                        --build-arg VERSION=3.3.0-SNAPSHOT.jar
+                    '''
+                }
+            }
+        }
     }
 }
