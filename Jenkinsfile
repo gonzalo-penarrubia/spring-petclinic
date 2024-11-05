@@ -21,6 +21,8 @@ pipeline {
                     println '(develop y main):  Build a jar file.'
                     sh './mvnw package -Dmaven.test.skip=true'
                     archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                }
+            }
         }
         stage('Unit Tests') {
             when {
@@ -37,6 +39,7 @@ pipeline {
                         mvn test
                     '''
                     junit '**/target/surefire-reports/*.xml'
+                }
             }
         }
         stage('Publish Artifact') {
