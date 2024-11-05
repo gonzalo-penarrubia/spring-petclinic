@@ -38,7 +38,6 @@ pipeline {
                     '''
                     junit '**/target/surefire-reports/*.xml'
         }
-
         stage('Publish Artifact') {
             when {
                 anyOf {
@@ -62,7 +61,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build & Publish Container Image') {
             when {
                 anyOf {
