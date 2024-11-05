@@ -37,6 +37,7 @@ pipeline {
                         mvn test
                     '''
                     junit '**/target/surefire-reports/*.xml'
+            }
         }
         stage('Publish Artifact') {
             when {
