@@ -14,5 +14,15 @@ pipeline {
                 }
             }
         }
+        stage('Build') {
+            steps {
+                container('maven') {
+                    println '01# Stage - Build'
+                    println '(develop y main):  Build a jar file.'
+                    sh './mvnw package -Dmaven.test.skip=true'
+                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        }
+    }
+}
     }
 }
